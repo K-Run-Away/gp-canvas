@@ -1,4 +1,10 @@
 import { Medication } from '../../services/dmd';
+import { antibiotics } from './antibiotics';
+import { painAndInflammation } from './pain-inflammation';
 
-// Export an empty array since we're using CSV data now
-export const commonMedications: Medication[] = []; 
+// Combine all medication lists
+export const commonMedications: Medication[] = [
+  ...antibiotics,
+  ...painAndInflammation,
+  // Add more categories as they become available
+]; 

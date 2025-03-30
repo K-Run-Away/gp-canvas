@@ -1,6 +1,6 @@
 export interface Medication {
-  display: string;
-  search: string;
+  display: string;  // The display name of the medication
+  search: string;   // The search-friendly version of the name
 }
 
 // Import medications from the new structure

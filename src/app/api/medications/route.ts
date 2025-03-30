@@ -24,7 +24,7 @@ async function loadMedicationsFromCSV() {
         search: line.trim().toLowerCase().replace(/\s+/g, '-'),
       }));
     
-    // Cache the results
+    // Cache the results and combine with common medications
     medicationsCache = [...medications, ...commonMedications];
     return medicationsCache;
   } catch (error) {
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
   const results = allMedications.filter(med =>
     med.display.toLowerCase().includes(searchTerm) ||
     med.search.toLowerCase().includes(searchTerm)
-  );
+  ).slice(0, 10); // Limit to 10 results for better performance
 
   return NextResponse.json({ medications: results });
 } 
