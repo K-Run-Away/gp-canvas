@@ -17,7 +17,7 @@ async function loadConditionsFromCSV() {
   }
 
   try {
-    const csvPath = path.join(process.cwd(), 'data', 'conditions.csv');
+    const csvPath = path.join(process.cwd(), 'data', 'Conditions.csv');
     const fileContent = await fs.readFile(csvPath, 'utf-8');
     const conditions = fileContent
       .split('\n')
@@ -40,17 +40,22 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
 
+  console.log('Conditions API called with query:', query);
+
   if (!query || query.length < 2) {
+    console.log('Query too short, returning empty results');
     return NextResponse.json({ conditions: [] });
   }
 
   const allConditions = await loadConditionsFromCSV();
-  const searchTerm = query.toLowerCase().trim();
+  console.log('Loaded conditions count:', allConditions.length);
   
+  const searchTerm = query.toLowerCase().trim();
   const results = allConditions.filter(cond =>
     cond.display.toLowerCase().includes(searchTerm) ||
     cond.search.toLowerCase().includes(searchTerm)
   );
-
+  
+  console.log('Found matching conditions:', results.length);
   return NextResponse.json({ conditions: results });
 } 

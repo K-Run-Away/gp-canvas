@@ -237,15 +237,15 @@ export default function Home() {
     if (suggestions.length === 0) return null;
 
     return (
-      <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
+      <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto shadow-lg">
         {suggestions.map((item: Medication | Condition, index: number) => (
           <li
             key={index}
-            className={`px-3 py-2 cursor-pointer text-sm ${
+            className={`px-4 py-3 cursor-pointer text-sm ${
               index === selectedIndex && type === activeSuggestionList
                 ? 'bg-gray-100'
                 : 'hover:bg-gray-50'
-            }`}
+            } transition-colors duration-150`}
             onClick={() => {
               onSelect(item.display);
               if (type === 'adult') {
@@ -281,114 +281,126 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">GP Mate</h1>
-          <p className="text-gray-600 mb-8">Quick clinical reference lookup</p>
+      <div className="max-w-xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">GP Canvas</h1>
+          <p className="text-lg text-gray-600 mb-2">In the consultation, <span className="line-through">minutes</span> seconds matter.</p>
+          <div className="flex flex-col gap-1 text-gray-500 text-sm">
+            <p>Search medication <span className="text-blue-500">→</span> Indications and Doses BNF</p>
+            <p>Search condition <span className="text-purple-500">→</span> Management in NICE CKS</p>
+          </div>
         </div>
 
         {/* Adult BNF Search */}
-        <form onSubmit={handleAdultSearch} className="mt-8">
+        <form onSubmit={handleAdultSearch} className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Adult BNF Search
+            Adult BNF
           </label>
-          <div className="rounded-md shadow-sm relative">
+          <div className="rounded-lg shadow-sm relative">
             <input
               type="text"
               value={adultSearchTerm}
               onChange={(e) => setAdultSearchTerm(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, 'adult')}
               placeholder="Search adult medications..."
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all duration-200"
               autoFocus
             />
             {renderSuggestions(adultSuggestions, (value) => setAdultSearchTerm(value), 'adult')}
           </div>
           <button
             type="submit"
-            className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
             Search BNF
           </button>
         </form>
 
         {/* Children's BNF Search */}
-        <form onSubmit={handleChildSearch} className="mt-6">
+        <form onSubmit={handleChildSearch} className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Children's BNF Search
+            Children BNF
           </label>
-          <div className="rounded-md shadow-sm relative">
+          <div className="rounded-lg shadow-sm relative">
             <input
               type="text"
               value={childSearchTerm}
               onChange={(e) => setChildSearchTerm(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, 'child')}
               placeholder="Search children's medications..."
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:text-sm transition-all duration-200"
             />
             {renderSuggestions(childSuggestions, (value) => setChildSearchTerm(value), 'child')}
           </div>
           <button
             type="submit"
-            className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
           >
             Search BNFc
           </button>
         </form>
 
         {/* Interactions Search */}
-        <form onSubmit={handleInteractionSearch} className="mt-6">
+        <form onSubmit={handleInteractionSearch} className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            BNF Interactions Search
+            Interactions BNF
           </label>
-          <div className="rounded-md shadow-sm relative">
+          <div className="rounded-lg shadow-sm relative">
             <input
               type="text"
               value={interactionSearchTerm}
               onChange={(e) => setInteractionSearchTerm(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, 'interaction')}
               placeholder="Search medication interactions..."
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent sm:text-sm transition-all duration-200"
             />
             {renderSuggestions(interactionSuggestions, (value) => setInteractionSearchTerm(value), 'interaction')}
           </div>
           <button
             type="submit"
-            className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+            className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
           >
             Search Interactions
           </button>
         </form>
 
         {/* CKS Search */}
-        <form onSubmit={handleCksSearch} className="mt-6">
+        <form onSubmit={handleCksSearch} className="mb-8">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            CKS Guidelines Search
+            NICE CKS
           </label>
-          <div className="rounded-md shadow-sm relative">
+          <div className="rounded-lg shadow-sm relative">
             <input
               type="text"
               value={cksSearchTerm}
               onChange={(e) => setCksSearchTerm(e.target.value)}
               onKeyDown={(e) => handleKeyDown(e, 'cks')}
               placeholder="Search conditions (e.g. gout, migraine)..."
-              className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent sm:text-sm transition-all duration-200"
             />
             {renderSuggestions(cksSuggestions, (value) => setCksSearchTerm(value), 'cks')}
           </div>
           <button
             type="submit"
-            className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
           >
             Search CKS
           </button>
         </form>
 
-        <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <p className="text-center text-sm text-yellow-800">
-            Important: BNF access is only available in the UK (England, Scotland, Wales and Northern Ireland). 
-            If you are outside the UK, you will need a MedicinesComplete subscription to access BNF content.
-          </p>
+        <div className="mt-12 space-y-4">
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
+            <p className="text-center text-sm text-yellow-800">
+              Important: BNF and CKS access is only available in the UK (England, Scotland, Wales and Northern Ireland). 
+              If you are outside the UK, you will need a MedicinesComplete subscription to access BNF content, and CKS content is not accessible.
+            </p>
+          </div>
+          
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+            <p className="text-center text-sm text-gray-600">
+              Please check the webpage you are taken to is correct. We do not accept any clinical responsibility.
+            </p>
+          </div>
         </div>
       </div>
     </main>
