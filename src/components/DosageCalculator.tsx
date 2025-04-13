@@ -13,6 +13,9 @@ export default function DosageCalculator() {
   const [concentrationDoseUnit, setConcentrationDoseUnit] = useState<string>('mg');
   const [totalDose, setTotalDose] = useState<number>(0);
   const [volume, setVolume] = useState<number>(0);
+  const [dosesPerDay, setDosesPerDay] = useState<number>(1);
+  const [treatmentDays, setTreatmentDays] = useState<number>(1);
+  const [totalVolumeRequired, setTotalVolumeRequired] = useState<number>(0);
 
   useEffect(() => {
     // Calculate total dose whenever weight or dosage per kg changes
@@ -36,9 +39,25 @@ export default function DosageCalculator() {
       // Calculate volume: (total dose needed / concentration per ml)
       // First get concentration per ml: concDoseInMg / concentrationVolume
       const concPerMl = concDoseInMg / concentrationVolume;
-      setVolume(concPerMl > 0 ? (doseInMg / concPerMl) : 0);
+      const singleDoseVolume = concPerMl > 0 ? (doseInMg / concPerMl) : 0;
+      setVolume(singleDoseVolume);
+      
+      // Calculate total volume required
+      const totalVolume = singleDoseVolume * dosesPerDay * treatmentDays;
+      setTotalVolumeRequired(totalVolume);
     }
-  }, [weight, dosagePerKg, dosageUnit, concentrationDose, concentrationDoseUnit, concentrationVolume, isLiquid, totalDose]);
+  }, [
+    weight, 
+    dosagePerKg, 
+    dosageUnit, 
+    concentrationDose, 
+    concentrationDoseUnit, 
+    concentrationVolume, 
+    isLiquid, 
+    totalDose,
+    dosesPerDay,
+    treatmentDays
+  ]);
 
   const frequencies = [
     'Once per day',
@@ -173,13 +192,57 @@ export default function DosageCalculator() {
               </div>
             </div>
 
+            {/* Doses per day Input */}
+            <div className="flex items-center justify-between pt-2">
+              <label className="text-sm text-gray-600">Doses per day</label>
+              <div className="flex items-center">
+                <input
+                  type="number"
+                  value={dosesPerDay || ''}
+                  onChange={(e) => setDosesPerDay(Number(e.target.value))}
+                  className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-right"
+                  placeholder="1"
+                  min="1"
+                />
+              </div>
+            </div>
+
+            {/* Treatment duration Input */}
+            <div className="flex items-center justify-between pt-2">
+              <label className="text-sm text-gray-600">Treatment duration (days)</label>
+              <div className="flex items-center">
+                <input
+                  type="number"
+                  value={treatmentDays || ''}
+                  onChange={(e) => setTreatmentDays(Number(e.target.value))}
+                  className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-right"
+                  placeholder="1"
+                  min="1"
+                />
+              </div>
+            </div>
+
             {/* Volume Required Display */}
             <div className="flex items-center justify-between pt-2">
-              <label className="text-sm text-gray-600">Volume required</label>
+              <label className="text-sm text-gray-600">Volume per dose</label>
               <div className="flex items-center">
                 <input
                   type="number"
                   value={volume.toFixed(2)}
+                  readOnly
+                  className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-right bg-gray-50"
+                />
+                <span className="ml-2 text-sm text-gray-500">ml</span>
+              </div>
+            </div>
+
+            {/* Total Volume Required Display */}
+            <div className="flex items-center justify-between pt-2">
+              <label className="text-sm text-gray-600">Total volume required</label>
+              <div className="flex items-center">
+                <input
+                  type="number"
+                  value={totalVolumeRequired.toFixed(2)}
                   readOnly
                   className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-right bg-gray-50"
                 />

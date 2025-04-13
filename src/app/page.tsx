@@ -5,12 +5,22 @@ import { searchMedications, Medication } from '../services/dmd';
 import { searchConditions, Condition } from '../services/conditions';
 import Stopwatch from '../components/Stopwatch';
 import DosageCalculator from '../components/DosageCalculator';
+import BirminghamNumbersSearch from '../components/BirminghamNumbersSearch';
+import PostClinicWindDown from '../components/PostClinicWindDown';
+import BoxBreathing from '../components/BoxBreathing';
+import SCATimer from '../components/SCATimer';
+import WellbeingChecklist from '../components/WellbeingChecklist';
+import StickyNote from '../components/StickyNote';
+import Sidebar from '../components/Sidebar';
+import NatureGallery from '../components/NatureGallery';
+import MusicPlayer from '../components/MusicPlayer';
 
 export default function Home() {
   const [adultSearchTerm, setAdultSearchTerm] = useState('');
   const [childSearchTerm, setChildSearchTerm] = useState('');
   const [interactionSearchTerm, setInteractionSearchTerm] = useState('');
   const [cksSearchTerm, setCksSearchTerm] = useState('');
+  const [selectedTab, setSelectedTab] = useState('save-time');
   
   const [adultSuggestions, setAdultSuggestions] = useState<Medication[]>([]);
   const [childSuggestions, setChildSuggestions] = useState<Medication[]>([]);
@@ -282,142 +292,202 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            GP Canvas <span className="text-lg font-normal text-gray-500">(in early testing mode, not yet ready for use in clinical environments)</span>
-          </h1>
-          <p className="text-lg text-gray-600 mb-2">In the consultation, <span className="line-through">minutes</span> seconds matter.</p>
-          <div className="flex flex-col gap-1 text-gray-500 text-sm">
-            <p>Search medication <span className="text-blue-500">→</span> Indications and Doses BNF</p>
-            <p>Search condition <span className="text-purple-500">→</span> Management in NICE CKS</p>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Main Content Area */}
+      <div className="pl-4 pr-[calc(400px+1rem)] sm:pl-6 lg:pl-8 pt-8 pb-4">
+        {/* Tab Navigation */}
+        <div className="flex space-x-2 mb-8">
+          <button
+            onClick={() => setSelectedTab('save-time')}
+            className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${
+              selectedTab === 'save-time'
+                ? 'bg-white text-blue-600 border-t border-l border-r border-gray-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Save Time
+          </button>
+          <button
+            onClick={() => setSelectedTab('rejuvenate')}
+            className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${
+              selectedTab === 'rejuvenate'
+                ? 'bg-white text-blue-600 border-t border-l border-r border-gray-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Rejuvenate
+          </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
-          {/* Left column - Search Forms */}
-          <div>
-            {/* Adult BNF Search */}
-            <form onSubmit={handleAdultSearch} className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Adult BNF
-              </label>
-              <div className="rounded-lg shadow-sm relative">
-                <input
-                  type="text"
-                  value={adultSearchTerm}
-                  onChange={(e) => setAdultSearchTerm(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, 'adult')}
-                  placeholder="Search adult medications..."
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm transition-all duration-200"
-                  autoFocus
-                />
-                {renderSuggestions(adultSuggestions, (value) => setAdultSearchTerm(value), 'adult')}
-              </div>
-              <button
-                type="submit"
-                className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-              >
-                Search BNF
-              </button>
-            </form>
+        {/* Tab Content */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {selectedTab === 'save-time' && (
+            <div className="flex gap-8">
+              {/* Search Components */}
+              <div className="w-[calc(50%-1rem)]">
+                {/* Adult BNF Search */}
+                <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                  <form onSubmit={handleAdultSearch}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Adult BNF
+                    </label>
+                    <div className="rounded-lg shadow-sm relative">
+                      <input
+                        type="text"
+                        value={adultSearchTerm}
+                        onChange={(e) => setAdultSearchTerm(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, 'adult')}
+                        placeholder="Search adult medications..."
+                        className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                        autoFocus
+                      />
+                      {renderSuggestions(adultSuggestions, (value) => setAdultSearchTerm(value), 'adult')}
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Search BNF
+                    </button>
+                  </form>
+                </div>
 
-            {/* Children's BNF Search */}
-            <form onSubmit={handleChildSearch} className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Children BNF
-              </label>
-              <div className="rounded-lg shadow-sm relative">
-                <input
-                  type="text"
-                  value={childSearchTerm}
-                  onChange={(e) => setChildSearchTerm(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, 'child')}
-                  placeholder="Search children's medications..."
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:text-sm transition-all duration-200"
-                />
-                {renderSuggestions(childSuggestions, (value) => setChildSearchTerm(value), 'child')}
-              </div>
-              <button
-                type="submit"
-                className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
-              >
-                Search BNFc
-              </button>
-            </form>
+                {/* Child BNFC Search */}
+                <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                  <form onSubmit={handleChildSearch}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Children BNF
+                    </label>
+                    <div className="rounded-lg shadow-sm relative">
+                      <input
+                        type="text"
+                        value={childSearchTerm}
+                        onChange={(e) => setChildSearchTerm(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, 'child')}
+                        placeholder="Search children's medications..."
+                        className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent sm:text-sm"
+                      />
+                      {renderSuggestions(childSuggestions, (value) => setChildSearchTerm(value), 'child')}
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      Search BNFc
+                    </button>
+                  </form>
+                </div>
 
-            {/* Interactions Search */}
-            <form onSubmit={handleInteractionSearch} className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Interactions BNF
-              </label>
-              <div className="rounded-lg shadow-sm relative">
-                <input
-                  type="text"
-                  value={interactionSearchTerm}
-                  onChange={(e) => setInteractionSearchTerm(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, 'interaction')}
-                  placeholder="Search medication interactions..."
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent sm:text-sm transition-all duration-200"
-                />
-                {renderSuggestions(interactionSuggestions, (value) => setInteractionSearchTerm(value), 'interaction')}
-              </div>
-              <button
-                type="submit"
-                className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
-              >
-                Search Interactions
-              </button>
-            </form>
+                {/* Interaction Checker */}
+                <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                  <form onSubmit={handleInteractionSearch}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Interactions BNF
+                    </label>
+                    <div className="rounded-lg shadow-sm relative">
+                      <input
+                        type="text"
+                        value={interactionSearchTerm}
+                        onChange={(e) => setInteractionSearchTerm(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, 'interaction')}
+                        placeholder="Search medication interactions..."
+                        className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent sm:text-sm"
+                      />
+                      {renderSuggestions(interactionSuggestions, (value) => setInteractionSearchTerm(value), 'interaction')}
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                    >
+                      Search Interactions
+                    </button>
+                  </form>
+                </div>
 
-            {/* CKS Search */}
-            <form onSubmit={handleCksSearch} className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                NICE CKS
-              </label>
-              <div className="rounded-lg shadow-sm relative">
-                <input
-                  type="text"
-                  value={cksSearchTerm}
-                  onChange={(e) => setCksSearchTerm(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, 'cks')}
-                  placeholder="Search conditions (e.g. gout, migraine)..."
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent sm:text-sm transition-all duration-200"
-                />
-                {renderSuggestions(cksSuggestions, (value) => setCksSearchTerm(value), 'cks')}
+                {/* NICE CKS Search */}
+                <div className="bg-white p-6 rounded-lg shadow-md mb-4">
+                  <form onSubmit={handleCksSearch}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      NICE CKS
+                    </label>
+                    <div className="rounded-lg shadow-sm relative">
+                      <input
+                        type="text"
+                        value={cksSearchTerm}
+                        onChange={(e) => setCksSearchTerm(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e, 'cks')}
+                        placeholder="Search CKS topics..."
+                        className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent sm:text-sm"
+                      />
+                      {renderSuggestions(cksSuggestions, (value) => setCksSearchTerm(value), 'cks')}
+                    </div>
+                    <button
+                      type="submit"
+                      className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                    >
+                      Search CKS
+                    </button>
+                  </form>
+                </div>
               </div>
-              <button
-                type="submit"
-                className="mt-3 w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
-              >
-                Search CKS
-              </button>
-            </form>
 
-            <div className="mt-12 space-y-4">
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
-                <p className="text-center text-sm text-yellow-800">
-                  Important: BNF and CKS access is only available in the UK (England, Scotland, Wales and Northern Ireland). 
-                  If you are outside the UK, you will need a MedicinesComplete subscription to access BNF content, and CKS content is not accessible.
-                </p>
-              </div>
-              
-              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
-                <p className="text-center text-sm text-gray-600">
-                  Please check the webpage you are taken to is correct. We do not accept any clinical responsibility.
-                </p>
+              {/* Middle Section - Birmingham Numbers and Dosage Calculator */}
+              <div className="w-[calc(50%-1rem)] space-y-8">
+                {/* Birmingham Numbers */}
+                <BirminghamNumbersSearch />
+                
+                {/* Dosage Calculator */}
+                <DosageCalculator />
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Right column - Widgets */}
-          <div className="space-y-6">
-            <Stopwatch />
-            <DosageCalculator />
-          </div>
+          {selectedTab === 'rejuvenate' && (
+            <div>
+              {/* Scenic Background Section */}
+              <div 
+                className="relative mb-8 h-64 overflow-hidden rounded-t-lg -mt-6 -mx-6"
+                style={{
+                  backgroundImage: 'url(images/mountain-lake.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white" 
+                  style={{
+                    background: 'linear-gradient(to bottom, transparent 40%, rgba(255,255,255,0.7) 80%, white 100%)'
+                  }}
+                />
+              </div>
+
+              <div className="space-y-6 relative -mt-12">
+                <div className="grid grid-cols-3 gap-6">
+                  <div className="col-span-1">
+                    <WellbeingChecklist />
+                  </div>
+                  <div className="col-span-1">
+                    <BoxBreathing />
+                  </div>
+                  <div className="col-span-1">
+                    <PostClinicWindDown />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-1">
+                    <NatureGallery />
+                  </div>
+                  <div className="col-span-1">
+                    <MusicPlayer />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </main>
+
+      {/* Sidebar */}
+      <Sidebar />
+    </div>
   );
 } 
