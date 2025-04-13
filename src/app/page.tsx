@@ -20,7 +20,7 @@ export default function Home() {
   const [childSearchTerm, setChildSearchTerm] = useState('');
   const [interactionSearchTerm, setInteractionSearchTerm] = useState('');
   const [cksSearchTerm, setCksSearchTerm] = useState('');
-  const [selectedTab, setSelectedTab] = useState('save-time');
+  const [selectedTab, setSelectedTab] = useState('consultation');
   
   const [adultSuggestions, setAdultSuggestions] = useState<Medication[]>([]);
   const [childSuggestions, setChildSuggestions] = useState<Medication[]>([]);
@@ -30,6 +30,23 @@ export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [activeSuggestionList, setActiveSuggestionList] = useState<'adult' | 'child' | 'interaction' | 'cks' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleAdultSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adultSearchTerm.trim()) return;
+
+    const match = adultSuggestions.find(
+      med => med.display.toLowerCase() === adultSearchTerm.toLowerCase() ||
+             med.search.toLowerCase() === adultSearchTerm.toLowerCase()
+    );
+
+    const formattedSearch = match ? match.search : adultSearchTerm.trim().toLowerCase().replace(/\s+/g, '-');
+    const bnfUrl = `https://bnf.nice.org.uk/drugs/${formattedSearch}/#indications-and-dose`;
+    window.open(bnfUrl, '_blank');
+    setSelectedIndex(-1);
+    setAdultSearchTerm('');
+    setAdultSuggestions([]);
+  };
 
   // Reset selection when suggestions change
   useEffect(() => {
@@ -177,23 +194,6 @@ export default function Home() {
     }
   };
 
-  const handleAdultSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!adultSearchTerm.trim()) return;
-
-    const match = adultSuggestions.find(
-      med => med.display.toLowerCase() === adultSearchTerm.toLowerCase() ||
-             med.search.toLowerCase() === adultSearchTerm.toLowerCase()
-    );
-
-    const formattedSearch = match ? match.search : adultSearchTerm.trim().toLowerCase().replace(/\s+/g, '-');
-    const bnfUrl = `https://bnf.nice.org.uk/drugs/${formattedSearch}/#indications-and-dose`;
-    window.open(bnfUrl, '_blank');
-    setSelectedIndex(-1);
-    setAdultSearchTerm('');
-    setAdultSuggestions([]);
-  };
-
   const handleChildSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!childSearchTerm.trim()) return;
@@ -298,30 +298,30 @@ export default function Home() {
         {/* Tab Navigation */}
         <div className="flex space-x-2 mb-8">
           <button
-            onClick={() => setSelectedTab('save-time')}
+            onClick={() => setSelectedTab('consultation')}
             className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${
-              selectedTab === 'save-time'
+              selectedTab === 'consultation'
                 ? 'bg-white text-blue-600 border-t border-l border-r border-gray-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Save Time
+            Consultation Mode
           </button>
           <button
-            onClick={() => setSelectedTab('rejuvenate')}
+            onClick={() => setSelectedTab('wellbeing')}
             className={`px-6 py-3 text-sm font-medium rounded-t-lg transition-colors ${
-              selectedTab === 'rejuvenate'
+              selectedTab === 'wellbeing'
                 ? 'bg-white text-blue-600 border-t border-l border-r border-gray-200'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Rejuvenate
+            Wellbeing Mode
           </button>
         </div>
 
         {/* Tab Content */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          {selectedTab === 'save-time' && (
+          {selectedTab === 'consultation' && (
             <div className="flex gap-8">
               {/* Search Components */}
               <div className="w-[calc(50%-1rem)]">
@@ -442,7 +442,7 @@ export default function Home() {
             </div>
           )}
 
-          {selectedTab === 'rejuvenate' && (
+          {selectedTab === 'wellbeing' && (
             <div>
               {/* Scenic Background Section */}
               <div 
