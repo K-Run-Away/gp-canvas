@@ -13,7 +13,7 @@ export default function IntegratedTimer() {
   const [scaPhase, setSCAPhase] = useState<SCAPhase>('data');
   const [workDuration, setWorkDuration] = useState(25); // Default to 25 minutes
   
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const workerRef = useRef<Worker | null>(null);
 
   // Constants
   const POMODORO_WORK_TIME = workDuration * 60; // workDuration minutes
@@ -23,44 +23,34 @@ export default function IntegratedTimer() {
   const SCA_WARNING_TIME = 1 * 60; // 1 minute in seconds
 
   useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = setInterval(() => {
-        setTime(prevTime => {
-          const newTime = mode === 'stopwatch' ? prevTime + 1 : prevTime - 1;
-
-          // Handle Pomodoro transitions
-          if (mode === 'pomodoro' && newTime <= 0) {
-            const nextMode = pomodoroMode === 'work' ? 'break' : 'work';
-            setPomodoroMode(nextMode);
-            return nextMode === 'work' ? POMODORO_WORK_TIME : POMODORO_BREAK_TIME;
-          }
-
-          // Handle SCA phase transitions
-          if (mode === 'sca') {
-            if (newTime <= SCA_WARNING_TIME && scaPhase !== 'warning') {
-              setSCAPhase('warning');
-            } else if (newTime <= SCA_MANAGEMENT_TIME && scaPhase === 'data') {
-              setSCAPhase('management');
-            }
-
-            if (newTime <= 0) {
-              setIsRunning(false);
-              clearInterval(intervalRef.current!);
-              return 0;
-            }
-          }
-
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+    // Initialize Web Worker
+    workerRef.current = new Worker(new URL('../workers/timerWorker.js', import.meta.url));
+    
+    workerRef.current.onmessage = (e) => {
+      const { timeLeft, pomodoroMode: newPomodoroMode } = e.data;
+      setTime(timeLeft);
+      if (newPomodoroMode !== pomodoroMode) {
+        setPomodoroMode(newPomodoroMode);
       }
     };
-  }, [isRunning, mode, pomodoroMode, scaPhase]);
+
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
+  }, []);
+
+  // Handle SCA phase transitions
+  useEffect(() => {
+    if (mode === 'sca' && isRunning) {
+      if (time <= SCA_WARNING_TIME && scaPhase !== 'warning') {
+        setSCAPhase('warning');
+      } else if (time <= SCA_MANAGEMENT_TIME && scaPhase === 'data') {
+        setSCAPhase('management');
+      }
+    }
+  }, [time, mode, scaPhase, isRunning]);
 
   const handleStart = () => {
     if (mode === 'pomodoro') {
@@ -71,12 +61,25 @@ export default function IntegratedTimer() {
       setSCAPhase('data');
     }
     setIsRunning(true);
+    
+    if (workerRef.current) {
+      workerRef.current.postMessage({
+        type: 'START',
+        data: {
+          initialTime: mode === 'pomodoro' ? POMODORO_WORK_TIME : 
+                     mode === 'sca' ? SCA_TOTAL_TIME : 0,
+          mode,
+          pomodoroMode,
+          workDuration
+        }
+      });
+    }
   };
 
   const handleStop = () => {
     setIsRunning(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    if (workerRef.current) {
+      workerRef.current.postMessage({ type: 'STOP' });
     }
     setTime(0);
     if (mode === 'pomodoro') {
@@ -87,21 +90,22 @@ export default function IntegratedTimer() {
   };
 
   const handleReset = () => {
-    if (mode === 'pomodoro') {
-      setTime(POMODORO_WORK_TIME);
-      setPomodoroMode('work');
-    } else if (mode === 'sca') {
-      setTime(SCA_TOTAL_TIME);
-      setSCAPhase('data');
-    } else {
-      setTime(0);
+    if (workerRef.current) {
+      workerRef.current.postMessage({
+        type: 'RESET',
+        data: {
+          initialTime: mode === 'pomodoro' ? POMODORO_WORK_TIME : 
+                     mode === 'sca' ? SCA_TOTAL_TIME : 0,
+          pomodoroMode: 'work'
+        }
+      });
     }
   };
 
   const handleModeChange = (newMode: TimerMode) => {
     setIsRunning(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    if (workerRef.current) {
+      workerRef.current.postMessage({ type: 'STOP' });
     }
     setMode(newMode);
     if (newMode === 'pomodoro') {
