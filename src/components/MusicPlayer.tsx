@@ -4,7 +4,20 @@ const tracks = [
   {
     title: "Relaxing Music",
     src: "/audio/relaxing-music.mp3",
-    duration: "1:00:00"  // You can adjust this to match your file's actual duration
+    duration: "1:00:00",
+    type: "relaxing"
+  },
+  {
+    title: "Energizing Music",
+    src: "/audio/energizing-music.mp3",
+    duration: "1:00:00",
+    type: "energizing"
+  },
+  {
+    title: "Lofi Chill",
+    src: "/audio/lofi-chill.mp3",
+    duration: "1:00:00",
+    type: "lofi"
   }
 ];
 
@@ -22,6 +35,14 @@ export default function MusicPlayer() {
         audioRef.current.play();
       }
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  const switchTrack = (index: number) => {
+    setCurrentTrack(index);
+    setIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
     }
   };
 
@@ -51,12 +72,29 @@ export default function MusicPlayer() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Relaxing Music</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Music Player</h2>
       
+      <div className="flex flex-wrap gap-2 mb-4">
+        {tracks.map((track, index) => (
+          <button
+            key={index}
+            onClick={() => switchTrack(index)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              currentTrack === index
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {track.type.charAt(0).toUpperCase() + track.type.slice(1)}
+          </button>
+        ))}
+      </div>
+
       <audio
         ref={audioRef}
         src={tracks[currentTrack].src}
         onEnded={() => setIsPlaying(false)}
+        loop
       />
 
       <div className="space-y-4">

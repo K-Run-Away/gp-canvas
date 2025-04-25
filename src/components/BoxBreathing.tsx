@@ -2,21 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-export default function BoxBreathing() {
+export default function TakeABreath() {
   const [isRunning, setIsRunning] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'rest'>('inhale');
-  const [timeLeft, setTimeLeft] = useState(4);
+  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'quick-inhale' | 'exhale'>('inhale');
+  const [timeLeft, setTimeLeft] = useState(3);
   const [scale, setScale] = useState(1);
   const [isSoundOn, setIsSoundOn] = useState(false);
   const [audioError, setAudioError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   // Phase durations in seconds
   const phaseDurations = {
-    inhale: 4,
-    hold: 2,
-    exhale: 6,
-    rest: 2
+    inhale: 3,
+    'quick-inhale': 1,
+    exhale: 8
   };
 
   useEffect(() => {
@@ -24,24 +24,28 @@ export default function BoxBreathing() {
     let animationFrame: number;
 
     if (isRunning) {
+      startTimeRef.current = Date.now();
+      
       timer = setInterval(() => {
+        // Check if 5 minutes have passed
+        if (startTimeRef.current && Date.now() - startTimeRef.current >= 5 * 60 * 1000) {
+          handleStop();
+          return;
+        }
+
         setTimeLeft((prev) => {
           if (prev <= 1) {
             // Transition to next phase
             switch (currentPhase) {
               case 'inhale':
-                setCurrentPhase('hold');
-                setScale(1.2);
-                return phaseDurations.hold;
-              case 'hold':
+                setCurrentPhase('quick-inhale');
+                setScale(1.1);
+                return phaseDurations['quick-inhale'];
+              case 'quick-inhale':
                 setCurrentPhase('exhale');
                 setScale(1.2);
                 return phaseDurations.exhale;
               case 'exhale':
-                setCurrentPhase('rest');
-                setScale(1);
-                return phaseDurations.rest;
-              case 'rest':
                 setCurrentPhase('inhale');
                 setScale(1);
                 return phaseDurations.inhale;
@@ -53,7 +57,7 @@ export default function BoxBreathing() {
 
       // Animate the breathing circle
       const animate = () => {
-        if (currentPhase === 'inhale') {
+        if (currentPhase === 'inhale' || currentPhase === 'quick-inhale') {
           setScale((prev) => Math.min(prev + 0.05, 1.2));
         } else if (currentPhase === 'exhale') {
           setScale((prev) => Math.max(prev - 0.05, 1));
@@ -119,31 +123,27 @@ export default function BoxBreathing() {
     switch (currentPhase) {
       case 'inhale':
         return 'bg-teal-400';
-      case 'hold':
+      case 'quick-inhale':
         return 'bg-emerald-400';
       case 'exhale':
         return 'bg-sky-400';
-      case 'rest':
-        return 'bg-indigo-400';
     }
   };
 
   const getPhaseText = () => {
     switch (currentPhase) {
       case 'inhale':
-        return 'Breathe In';
-      case 'hold':
-        return 'Hold';
+        return 'Inhale through nose (80%)';
+      case 'quick-inhale':
+        return 'Take a second quick inhale';
       case 'exhale':
-        return 'Breathe Out';
-      case 'rest':
-        return 'Rest';
+        return 'Exhale through mouth';
     }
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md h-full">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Box Breathing Exercise</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">Take a Breath</h2>
       
       <div className="flex flex-col items-center space-y-3">
         {/* Breathing Circle */}
@@ -154,9 +154,6 @@ export default function BoxBreathing() {
               transform: `scale(${scale})`,
             }}
           />
-          <div className="absolute text-white text-2xl font-bold">
-            {timeLeft}
-          </div>
         </div>
 
         {/* Phase Text */}
@@ -193,26 +190,31 @@ export default function BoxBreathing() {
           </button>
         </div>
 
+        {/* Citation */}
+        <div className="text-xs text-center text-gray-400 mt-2">
+          Cyclic Sigh - Balban, Y., Spiegel, D., et al. (2023)
+        </div>
+
         {audioError && (
           <p className="text-red-500 text-sm">{audioError}</p>
         )}
-
-        {/* Audio Element */}
-        <audio
-          ref={audioRef}
-          src="/audio/calming-music.mp3"
-          loop
-          preload="auto"
-          onError={(e) => {
-            console.error('Audio error:', e);
-            setAudioError('Failed to load audio file. Please check your internet connection and try again.');
-          }}
-          onCanPlay={() => {
-            console.log('Audio can play');
-            setAudioError(null);
-          }}
-        />
       </div>
+      
+      {/* Audio Element */}
+      <audio
+        ref={audioRef}
+        src="/audio/calming-music.mp3"
+        loop
+        preload="auto"
+        onError={(e) => {
+          console.error('Audio error:', e);
+          setAudioError('Failed to load audio file. Please check your internet connection and try again.');
+        }}
+        onCanPlay={() => {
+          console.log('Audio can play');
+          setAudioError(null);
+        }}
+      />
     </div>
   );
 } 

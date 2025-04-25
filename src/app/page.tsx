@@ -7,7 +7,7 @@ import Stopwatch from '../components/Stopwatch';
 import DosageCalculator from '../components/DosageCalculator';
 import BirminghamNumbersSearch from '../components/BirminghamNumbersSearch';
 import PostClinicWindDown from '../components/PostClinicWindDown';
-import BoxBreathing from '../components/BoxBreathing';
+import TakeABreath from '../components/BoxBreathing';
 import SCATimer from '../components/SCATimer';
 import WellbeingChecklist from '../components/WellbeingChecklist';
 import StickyNote from '../components/StickyNote';
@@ -466,7 +466,7 @@ export default function Home() {
                     <WellbeingChecklist />
                   </div>
                   <div className="col-span-1">
-                    <BoxBreathing />
+                    <TakeABreath />
                   </div>
                   <div className="col-span-1">
                     <PostClinicWindDown />

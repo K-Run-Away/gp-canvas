@@ -10,7 +10,11 @@ export default function Stopwatch() {
   const [workDuration, setWorkDuration] = useState(25); // Default to 25 minutes
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const POMODORO_BREAK_TIME = 5 * 60 * 1000; // 5 minutes
+  // Break durations based on work duration
+  const getBreakDuration = () => {
+    return workDuration === 25 ? 5 * 60 * 1000 : 10 * 60 * 1000; // 5 min for 25 min work, 10 min for 50 min work
+  };
+
   const POMODORO_WORK_TIME = workDuration * 60 * 1000; // workDuration minutes
 
   useEffect(() => {
@@ -31,7 +35,7 @@ export default function Stopwatch() {
                 audioRef.current.play();
               }
               setIsBreakTime(!isBreakTime);
-              return isBreakTime ? POMODORO_WORK_TIME : POMODORO_BREAK_TIME;
+              return isBreakTime ? POMODORO_WORK_TIME : getBreakDuration();
             }
             return newTime;
           }
@@ -61,7 +65,7 @@ export default function Stopwatch() {
 
   const handleWorkDurationChange = (duration: number) => {
     setWorkDuration(duration);
-    if (isPomodoroMode && !isBreakTime) {
+    if (isPomodoroMode) {
       setTime(duration * 60 * 1000);
     }
   };
@@ -120,7 +124,7 @@ export default function Stopwatch() {
           <button
             onClick={() => {
               if (isPomodoroMode && !isRunning) {
-                setTime(isBreakTime ? POMODORO_BREAK_TIME : POMODORO_WORK_TIME);
+                setTime(isBreakTime ? getBreakDuration() : POMODORO_WORK_TIME);
               }
               setIsRunning(!isRunning);
             }}
