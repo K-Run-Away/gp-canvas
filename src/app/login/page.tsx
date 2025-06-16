@@ -38,6 +38,9 @@ export default function LoginPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Welcome to GP Mate
           </h2>
+          <div className="mt-4 mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-400 text-yellow-800 rounded text-sm">
+            Hi, this tool is currently a prototype at the testing stage and is <b>NOT</b> ready for use in clinical environments. It is being shown to a select few to gather feedback only. Thanks, please be sure to vote for which features you would want to see on the leaderboard. Dr KS
+          </div>
           <p className="mt-2 text-center text-sm text-gray-600">
             Please enter the password to continue
           </p>

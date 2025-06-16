@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 export async function POST(request: Request) {
   const { password } = await request.json()
 
-  if (password === 'kooz') {
+  if (password === 'beta') {
     // Set a cookie that expires in 7 days
     cookies().set('authenticated', 'true', {
       httpOnly: true,
